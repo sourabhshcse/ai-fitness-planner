@@ -5,6 +5,7 @@ import InputForm from './pages/InputForm'
 import Result from './pages/Result'
 import Chatbot from './pages/Chatbot'
 import Progress from './pages/Progress'
+import Challenge from "./pages/Challenge"
 
 export default function App() {
     return (
@@ -17,6 +18,7 @@ export default function App() {
                     <Route path="/result" element={<Result />} />
                     <Route path="/chatbot" element={<Chatbot />} />
                     <Route path="/progress" element={<Progress />} />
+                    <Route path="/challenge" element={<Challenge />} />
                 </Routes>
             </div>
         </Router>

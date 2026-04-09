@@ -4,10 +4,11 @@ export default function Navbar() {
     const location = useLocation()
 
     const links = [
-        { name: 'Home', path: '/' },
-        { name: 'Get Plan', path: '/plan' },
-        { name: 'AI Chat', path: '/chatbot' },
-        { name: 'Progress', path: '/progress' },
+        { name: 'Home',      path: '/'          },
+        { name: 'Get Plan',  path: '/plan'       },
+        { name: 'AI Chat',   path: '/chatbot'    },
+        { name: 'Progress',  path: '/progress'   },
+        { name: 'Challenge', path: '/challenge'  },
     ]
 
     return (
@@ -16,7 +17,6 @@ export default function Navbar() {
 
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-3">
-                    {/* Icon Box */}
                     <div className="w-9 h-9 bg-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M6 4v16M18 4v16M6 12h12M3 8h3M18 8h3M3 16h3M18 16h3"
@@ -24,7 +24,6 @@ export default function Navbar() {
                         </svg>
                     </div>
 
-                    {/* Brand Name */}
                     <div className="flex flex-col leading-none">
                         <span className="text-white font-extrabold text-lg tracking-tight">
                             Fit<span className="text-green-400">AI</span>
