@@ -1,53 +1,64 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
+from services.storage import load_progress, save_progress
+
+# ─── Router Setup ────────────────────────────────────────────────────────────
 
 router = APIRouter()
 
-# ✅ In-memory storage (simple list)
-progress_store: List[dict] = []
+# ─── Request Model ───────────────────────────────────────────────────────────
 
-# ✅ Input model
 class ProgressEntry(BaseModel):
-    date: str          # e.g. "2024-06-01"
-    weight: float      # in kg
-    notes: Optional[str] = ""
+    date:   str
+    weight: float
+    notes:  Optional[str] = ""
 
-# ✅ Add progress entry
+# ─── Routes ──────────────────────────────────────────────────────────────────
+
 @router.post("/progress/add")
 def add_progress(entry: ProgressEntry):
+    progress_store = load_progress()
+
     new_entry = {
-        "date": entry.date,
+        "date":   entry.date,
         "weight": entry.weight,
-        "notes": entry.notes
-    }
-    progress_store.append(new_entry)
-    return {
-        "status": "success",
-        "message": "Progress entry added!",
-        "entry": new_entry
+        "notes":  entry.notes,
     }
 
-# ✅ Get all progress entries
+    progress_store.append(new_entry)
+    save_progress(progress_store)
+
+    return {
+        "status":  "success",
+        "message": "Progress entry added!",
+        "entry":   new_entry,
+    }
+
+
 @router.get("/progress/get")
 def get_progress():
+    progress_store = load_progress()
+
     if not progress_store:
         return {
-            "status": "empty",
+            "status":  "empty",
             "message": "No progress entries yet",
-            "data": []
+            "data":    [],
         }
+
     return {
-        "status": "success",
+        "status":        "success",
         "total_entries": len(progress_store),
-        "data": progress_store
+        "data":          progress_store,
     }
 
-# ✅ Clear all progress entries
+
 @router.delete("/progress/clear")
 def clear_progress():
-    progress_store.clear()
+    save_progress([])
+
     return {
-        "status": "success",
-        "message": "All progress entries cleared!"
+        "status":  "success",
+        "message": "All progress entries cleared!",
     }

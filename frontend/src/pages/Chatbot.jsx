@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { sendChatMessage } from '../services/api'
+
+// ─── Constants ───────────────────────────────────────────────────────────────
 
 const SUGGESTIONS = [
     'Best diet for fat loss?',
@@ -8,16 +11,54 @@ const SUGGESTIONS = [
     'How to lose belly fat?',
 ]
 
+const INITIAL_MESSAGE = {
+    role: 'bot',
+    text: `Hey! 👋 I am your **AI Fitness Assistant** powered by *Google Gemini*.\n\nAsk me anything about:\n- 🥗 **Diet & Nutrition**\n- 🏋️ **Workouts & Exercise**\n- ⚖️ **Weight Loss & Muscle Gain**\n- 💧 **Hydration & Recovery**`,
+}
+
+// ─── Markdown Styles ─────────────────────────────────────────────────────────
+
+const MarkdownContent = ({ text }) => (
+    <ReactMarkdown
+        components={{
+            p:      ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+            strong: ({ children }) => <strong className="text-white font-bold">{children}</strong>,
+            em:     ({ children }) => <em className="text-green-300 not-italic font-medium">{children}</em>,
+            ul:     ({ children }) => <ul className="list-none space-y-1 my-2">{children}</ul>,
+            ol:     ({ children }) => <ol className="list-decimal list-inside space-y-1 my-2">{children}</ol>,
+            li:     ({ children }) => (
+                <li className="flex items-start gap-2">
+                    <span className="text-green-400 mt-0.5">•</span>
+                    <span>{children}</span>
+                </li>
+            ),
+            h1: ({ children }) => <h1 className="text-lg font-bold text-white mb-2">{children}</h1>,
+            h2: ({ children }) => <h2 className="text-base font-bold text-green-400 mb-2">{children}</h2>,
+            h3: ({ children }) => <h3 className="text-sm font-bold text-green-300 mb-1">{children}</h3>,
+            code: ({ children }) => (
+                <code className="bg-black/30 text-green-300 px-1.5 py-0.5 rounded text-xs font-mono">
+                    {children}
+                </code>
+            ),
+            blockquote: ({ children }) => (
+                <blockquote className="border-l-2 border-green-500 pl-3 my-2 text-gray-400 italic">
+                    {children}
+                </blockquote>
+            ),
+            hr: () => <hr className="border-white/10 my-3" />,
+        }}
+    >
+        {text}
+    </ReactMarkdown>
+)
+
+// ─── Main Component ──────────────────────────────────────────────────────────
+
 export default function Chatbot() {
-    const [messages, setMessages] = useState([
-        {
-            role: 'bot',
-            text: 'Hey! I am your AI fitness assistant powered by Gemini. Ask me anything about diet, workout or weight loss! 💪'
-        }
-    ])
-    const [input, setInput] = useState('')
-    const [loading, setLoading] = useState(false)
-    const bottomRef = useRef(null)
+    const [messages, setMessages] = useState([INITIAL_MESSAGE])
+    const [input,    setInput]    = useState('')
+    const [loading,  setLoading]  = useState(false)
+    const bottomRef               = useRef(null)
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -35,7 +76,10 @@ export default function Chatbot() {
             const data = await sendChatMessage(userMsg)
             setMessages(prev => [...prev, { role: 'bot', text: data.bot_response }])
         } catch {
-            setMessages(prev => [...prev, { role: 'bot', text: 'Sorry, something went wrong. Please try again!' }])
+            setMessages(prev => [...prev, {
+                role: 'bot',
+                text: '❌ Sorry, something went wrong. Please try again!'
+            }])
         } finally {
             setLoading(false)
         }
@@ -44,10 +88,11 @@ export default function Chatbot() {
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col pt-20">
 
-            {/* Header */}
+            {/* ── Header ── */}
             <div className="px-6 py-4 border-b border-white/10 bg-[#0a0a0a]">
                 <div className="max-w-2xl mx-auto flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-500/20 border border-purple-500/30 rounded-2xl flex items-center justify-center text-xl">
+                    <div className="w-10 h-10 bg-green-500/20 border border-green-500/30
+                                    rounded-2xl flex items-center justify-center text-xl">
                         🤖
                     </div>
                     <div>
@@ -61,52 +106,69 @@ export default function Chatbot() {
                 </div>
             </div>
 
-            {/* Messages */}
+            {/* ── Messages ── */}
             <div className="flex-1 overflow-y-auto px-6 py-6">
                 <div className="max-w-2xl mx-auto space-y-4">
 
-                    {/* Suggestion chips — show only at start */}
+                    {/* Suggestion Chips */}
                     {messages.length === 1 && (
                         <div className="flex flex-wrap gap-2 mb-4">
                             {SUGGESTIONS.map((s, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => sendMessage(s)}
-                                    className="bg-white/5 border border-white/10 hover:border-purple-500/40 text-gray-400 hover:text-white text-xs px-3 py-2 rounded-xl transition-all duration-200">
+                                <button key={i} onClick={() => sendMessage(s)}
+                                    className="bg-white/5 border border-white/10
+                                               hover:border-green-500/40 hover:bg-green-500/5
+                                               text-gray-400 hover:text-white
+                                               text-xs px-3 py-2 rounded-xl transition-all duration-200">
                                     {s}
                                 </button>
                             ))}
                         </div>
                     )}
 
-                    {/* Message bubbles */}
+                    {/* Message Bubbles */}
                     {messages.map((msg, i) => (
                         <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+
+                            {/* Bot Avatar */}
                             {msg.role === 'bot' && (
-                                <div className="w-7 h-7 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center text-sm mr-2 mt-1 flex-shrink-0">
+                                <div className="w-7 h-7 bg-green-500/20 border border-green-500/30
+                                                rounded-xl flex items-center justify-center
+                                                text-sm mr-2 mt-1 flex-shrink-0">
                                     🤖
                                 </div>
                             )}
-                            <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed
+
+                            {/* Bubble */}
+                            <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm
                                 ${msg.role === 'user'
                                     ? 'bg-green-500 text-black font-medium rounded-br-sm'
                                     : 'bg-white/5 border border-white/10 text-gray-300 rounded-bl-sm'
                                 }`}>
-                                {msg.text}
+                                {msg.role === 'bot'
+                                    ? <MarkdownContent text={msg.text} />
+                                    : msg.text
+                                }
                             </div>
                         </div>
                     ))}
 
-                    {/* Typing indicator */}
+                    {/* Typing Indicator */}
                     {loading && (
                         <div className="flex justify-start">
-                            <div className="w-7 h-7 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center text-sm mr-2 flex-shrink-0">
+                            <div className="w-7 h-7 bg-green-500/20 border border-green-500/30
+                                            rounded-xl flex items-center justify-center
+                                            text-sm mr-2 flex-shrink-0">
                                 🤖
                             </div>
-                            <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-2xl rounded-bl-sm flex items-center gap-1">
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            <div className="bg-white/5 border border-white/10
+                                            px-4 py-3 rounded-2xl rounded-bl-sm
+                                            flex items-center gap-1">
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce"
+                                     style={{ animationDelay: '0ms' }} />
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce"
+                                     style={{ animationDelay: '150ms' }} />
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce"
+                                     style={{ animationDelay: '300ms' }} />
                             </div>
                         </div>
                     )}
@@ -115,7 +177,7 @@ export default function Chatbot() {
                 </div>
             </div>
 
-            {/* Input Box */}
+            {/* ── Input Box ── */}
             <div className="px-6 py-4 border-t border-white/10 bg-[#0a0a0a]">
                 <div className="max-w-2xl mx-auto flex gap-3">
                     <input
@@ -124,12 +186,18 @@ export default function Chatbot() {
                         onChange={e => setInput(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && sendMessage()}
                         placeholder="Ask anything about fitness..."
-                        className="flex-1 bg-white/5 border border-white/10 focus:border-purple-500/50 text-white placeholder-gray-600 rounded-2xl px-4 py-3 outline-none transition-all duration-200 text-sm"
+                        className="flex-1 bg-white/5 border border-white/10
+                                   focus:border-green-500/50 text-white
+                                   placeholder-gray-600 rounded-2xl px-4 py-3
+                                   outline-none transition-all duration-200 text-sm"
                     />
                     <button
                         onClick={() => sendMessage()}
                         disabled={loading || !input.trim()}
-                        className="bg-purple-500 hover:bg-purple-400 disabled:opacity-40 text-white font-bold px-5 py-3 rounded-2xl transition-all duration-200 hover:scale-105">
+                        className="bg-green-500 hover:bg-green-400 disabled:opacity-40
+                                   text-black font-bold px-5 py-3 rounded-2xl
+                                   transition-all duration-200 hover:scale-105
+                                   shadow-lg shadow-green-500/20">
                         Send
                     </button>
                 </div>

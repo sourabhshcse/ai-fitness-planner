@@ -1,0 +1,32 @@
+{
+  "kavyansh.23bcon1137@jecrcu.edu.in": {
+    "email": "kavyansh.23bcon1137@jecrcu.edu.in",
+    "duration": 30,
+    "goal": "muscle_gain",
+    "preferred_time": "08:00",
+    "start_date": "2026-04-09",
+    "end_date": "2026-05-09",
+    "current_day": 1,
+    "active": true,
+    "plan": {
+      "name": "30 Day Challenge",
+      "phases": [
+        {
+          "days": "1-10",
+          "focus": "Foundation",
+          "intensity": "Light"
+        },
+        {
+          "days": "11-20",
+          "focus": "Build",
+          "intensity": "Moderate"
+        },
+        {
+          "days": "21-30",
+          "focus": "Peak",
+          "intensity": "High"
+        }
+      ]
+    }
+  }
+}
